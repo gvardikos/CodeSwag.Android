@@ -22,13 +22,24 @@ class CategoryAdapter(context: Context, categories: List<Category>): BaseAdapter
 
     override fun getView(position: Int, convertView: View?, viewGroup: ViewGroup?): View {
         val categoryView: View
-        categoryView = LayoutInflater.from(mContext).inflate(R.layout.category_list_item, null)
-        val categoryImage: ImageView = categoryView.findViewById(R.id.categoryImage)
-        val categoryName: TextView = categoryView.findViewById(R.id.categoryName)
+        val holder: ViewHolder
+
+        //the first time that cells are presented
+        if (convertView == null) {
+            categoryView = LayoutInflater.from(mContext).inflate(R.layout.category_list_item, null)
+            holder = ViewHolder()
+            //by giving the reference to the ViewHolder we recycle the views instead of recreating them all the time.
+            holder.categoryImage = categoryView.findViewById(R.id.categoryImage)
+            holder.categoryName = categoryView.findViewById(R.id.categoryName)
+            categoryView.tag = holder
+        } else {
+            holder = convertView.tag as ViewHolder
+            categoryView = convertView
+        }
 
         val resourceId = mContext.resources.getIdentifier(mCategories[position].image, "drawable",mContext.packageName)
-        categoryImage.setImageResource(resourceId)
-        categoryName.text = mCategories[position].title
+        holder.categoryImage?.setImageResource(resourceId)
+        holder.categoryName?.text = mCategories[position].title
 
         return categoryView
     }
@@ -43,5 +54,10 @@ class CategoryAdapter(context: Context, categories: List<Category>): BaseAdapter
 
     override fun getCount(): Int {
         return mCategories.size
+    }
+
+    private class ViewHolder {
+        var categoryImage: ImageView? = null
+        var categoryName: TextView? = null
     }
 }
